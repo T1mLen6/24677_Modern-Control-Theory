@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 
 m = 1 # kg
-gam = 3
+gam = 5 # or gamma = 5 as question asked
 alpha = 1.2
 sig = 0.1
 
@@ -17,7 +17,7 @@ A = alpha*gam*np.asarray([[0.,            G[0,1]/G[0,0], G[0,2]/G[0,0]],
                           [G[1,0]/G[1,1], 0.,            G[1,2]/G[1,1]],
                           [G[2,0]/G[2,2], G[2,1]/G[2,2], 0.          ]])
 
-condition = 1 # change this to 2 if using second conditon
+condition = 2 # change this to 2 if using second conditon
 
 
 p = np.asarray([[0.1],
@@ -46,7 +46,7 @@ t_array = []
 target_val = np.asarray([alpha * gam])
 
 
-for step in range(15):
+for step in range(25):
     p = np.dot(A, p) + B * sig**2
     p_array = np.hstack((p_array, p))
     si = np.array([G[0,0]*p[0], G[1,1]*p[1], G[2,2]*p[2]])
@@ -69,7 +69,7 @@ axs[0].set_title('Transmitter Power vs. Time (p = '+str(initial_p.reshape(1,3)) 
 axs[0].set_xlabel('Time step (s)')
 axs[0].set_ylabel('Transmitter Power')
 axs[0].grid()
-axs[0].legend()
+axs[0].legend(loc='upper right')
 
 axs[1].plot(t_array, s_array[0,:], label = "s1")
 axs[1].plot(t_array, s_array[1,:], label = "s2")
@@ -79,10 +79,11 @@ axs[1].set_title('SNIR vs. Time (p = '+str(initial_p.reshape(1,3)) + ", gamma = 
 axs[1].set_xlabel('Time step (s)')
 axs[1].set_ylabel('SNIR')
 axs[1].grid()
-axs[1].legend()
+axs[1].legend(loc='upper right')
 
 fig.tight_layout()
 
 #plt.legend()
+plt.savefig("p = "+str(initial_p.reshape(1,3)) + ", gamma = " + str(gam) + ".png", dpi = 600)
 plt.show()
 
