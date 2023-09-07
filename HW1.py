@@ -38,15 +38,16 @@ C = np.asarray([[0.]])
 D = np.asarray([[0.]])
 
 
-# define the continouse time linear system
-cart_sys = StateSpace(A, B, C, D)
+si = np.dot(G, p)
+qi = np.array([sig**2 + G[0,1]*p[1] + G[0,2]*p[2], sig**2 + G[1,0]*p[0] + G[1,2]*p[2], sig**2 + G[2,0]*p[0] + G[2,1]*p[1]])
+Si = si/qi
 
-# define simulation steps in time
-t = np.arange(0, 10, 1e-3)
-# define control input
-F = t**2
-# simulate the system
-_, y, x = lsim(cart_sys, F, t, X0=[0., 0.])
+p_array = np.zeros(3,1)
+s_array = np.zeros(3,1)
+
+for step in range(50):
+    p = np.dot(A, p) + B * sig**2
+
 # plot
 plt.figure(dpi=100)
 plt.plot(t, y)
