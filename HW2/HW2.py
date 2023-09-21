@@ -4,6 +4,11 @@ import matplotlib.pyplot as plt
 
 A = np.array([[0., 1.], 
              [-2., -2.]])
-b = np.array([[]])
+
+B = np.array([[1],[1]])
+
+C = np.array([2, 3])
+
+
 
 
