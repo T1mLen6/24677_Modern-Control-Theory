@@ -19,13 +19,15 @@ def compress_gray_img(image, ratio):
     print(K,m,n)
     U,s,V = svd(image)
     reconst_M = np.dot(np.dot(U[:,:K], np.diag(s[:K])), V[:K,:])
-    return reconst_M
+    sing_val = np.linalg.matrix_rank(reconst_M)
+    print("The number of singular values is: ", sing_val)
+    return reconst_M, sing_val
 
 img = cv2.imread('CMU_Grayscale.png', 0) 
 #img = Image.open('CMU_Grayscale.png')
 #img = img.convert('LA')
 ratio = 50
-final_img = compress_gray_img(img, ratio)
+final_img, sing_val = compress_gray_img(img, ratio)
 #plt.imshow(final_img, cmap='gray')
 
 
@@ -42,6 +44,7 @@ for i in range(img.shape[0]):
 # Display the image
 final_img = final_img.astype(np.uint8)
 cv2.imshow("Image", final_img)
+cv2.imwrite(str(ratio) + '%' + ' compression ratio_sing_val_' + str(sing_val) + '.png', final_img)
 #plt.imshow(final_img, plt.cm.gray_r)
  
 while True:
