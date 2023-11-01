@@ -132,11 +132,11 @@ class CustomController(BaseController):
               self.Ki_lon * self.cum_lon + 
               self.Kd_lon * (abs(xdot_err - self.pervXdotErr))/delT)
         
-        if self.i % 10 == 0:
-            print("------", psi_err_lon)
-            print("coeff:", (abs(psi_err_lon)*2 + 1))
-            print("dynamic;", dynamic_velocity)
-            print("speed:", F)
+        # if self.i % 10 == 0:
+        #     print("------", psi_err_lon)
+        #     print("coeff:", (abs(psi_err_lon)*2 + 1))
+        #     print("dynamic;", dynamic_velocity)
+        #     print("speed:", F)
         
         self.pervXdotErr = xdot_err
         
