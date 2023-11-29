@@ -41,7 +41,18 @@ class EKF_SLAM():
         Returns:
             x_next: A numpy array of size (3+2*n, ). The state at next time step
         """
-
+        dotX   = u[0]
+        dotY   = u[1]
+        dotPsi = u[2]
+        x_next = np.zeros([3+self.n*2])
+        ang = self._wrap_to_pi(x[2])
+        x_next[0] = x[0] + self.dt * (dotX * np.cos(ang) - dotY * np.sin(ang))
+        x_next[1] = x[1] + self.dt * (dotX * np.sin(ang) + dotY * np.cos(ang))
+        x_next[2] = self._wrap_to_pi(ang + self.dt * dotPsi)
+        
+        for i in range(self.n*2):
+             x_next[i+3] = x[i+3]
+        
         return x_next
 
     # TODO: complete the function below
@@ -56,7 +67,19 @@ class EKF_SLAM():
         Returns:
             y: A numpy array of size (2*n, ). The sensor measurement.
         """
-
+        xt   = x[0]
+        yt   = x[1]
+        psit = x[2]
+        y = np.zeros([2*self.n])
+        
+        for i in range(self.n):
+            
+            y[i] = np.sqrt(np.power((x[2*i+3] - xt),2) + np.power((x[2*i+4] - yt),2))
+            
+        for j in range(self.n, self.n*2):
+        
+            y[j] = self._wrap_to_pi(np.arctan2(x[2*(j-self.n)+4] - yt, x[2*(j-self.n)+3] - xt) - psit)
+  
         return y
 
     # TODO: complete the function below
@@ -70,6 +93,15 @@ class EKF_SLAM():
         Returns:
             F: A numpy array of size (3+2*n, 3+2*n). The jacobian of f evaluated at x_k.
         """
+        dotX   = u[0]
+        dotY   = u[1]
+        dotPsi = u[2]
+        
+        F = np.identity(3+2*self.n)
+        
+        ang = self._wrap_to_pi(self.mu[2])
+        F[0, 2] = -self.dt * (dotX * np.sin(ang) + dotY * np.cos(ang))
+        F[1, 2] =  self.dt * (dotX * np.cos(ang) - dotY * np.sin(ang))
 
         return F
 
@@ -83,7 +115,29 @@ class EKF_SLAM():
         Returns:
             H: A numpy array of size (2*n, 3+2*n). The jacobian of h evaluated at x_k.
         """
+        H =  np.zeros((2*self.n, 3+2*self.n))
+        x = self.mu[0]
+        y = self.mu[1]
 
+        for i in range(self.n):
+            mx = self.mu[2*i+3]
+            my = self.mu[2*i+4]
+
+            H[i, 0]     = (x - mx) / (np.sqrt(np.power((mx - x),2) + np.power((my - y),2)))
+            H[i, 1]     = (y - my) / (np.sqrt(np.power((mx - x),2) + np.power((my - y),2)))
+            H[i, 2*i+3] = (mx - x) / (np.sqrt(np.power((mx - x),2) + np.power((my - y),2)))
+            H[i, 2*i+4] = (my - y) / (np.sqrt(np.power((mx - x),2) + np.power((my - y),2)))
+        
+        for j in range(self.n, 2*self.n):
+            mx = self.mu[2*(j-self.n)+3]
+            my = self.mu[2*(j-self.n)+4]
+            
+            H[j, 0] = (my - y) / (np.power((mx - x),2) + np.power((my - y),2))
+            H[j, 1] = (x - mx) / (np.power((mx - x),2) + np.power((my - y),2))
+            H[j, 2] = -1
+            H[j, 2*(j-self.n) + 3] = (y - my) / (np.power((mx - x),2) + np.power((my - y),2))
+            H[j, 2*(j-self.n) + 4] = (mx - x) / (np.power((mx - x),2) + np.power((my - y),2))
+            
         return H
 
 
